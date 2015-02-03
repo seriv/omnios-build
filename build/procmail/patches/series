@@ -1,0 +1,6 @@
+procmail-3.22-rhconfig.patch -p1
+procmail-3.15.1-man.patch -p1
+procmail_3.22-8.debian.patch -p1
+procmail-3.22-truncate.patch -p1
+procmail-3.22-ipv6.patch -p1
+procmail-3.22-getline.patch -p1

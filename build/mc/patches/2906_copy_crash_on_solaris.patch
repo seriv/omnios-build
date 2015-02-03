@@ -1,0 +1,205 @@
+diff --git a/m4.include/fsusage.m4 b/m4.include/fsusage.m4
+index 17981f4..89637af 100644
+--- a/m4.include/fsusage.m4
++++ b/m4.include/fsusage.m4
+@@ -50,6 +50,14 @@ if test $ac_fsusage_space = no; then
+   # OpenBSD >= 4.4, AIX, HP-UX, IRIX, Solaris, Cygwin, Interix, BeOS.
+   AC_CACHE_CHECK([for statvfs function (SVR4)], [fu_cv_sys_stat_statvfs],
+                  [AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <sys/types.h>
++#if (defined __GLIBC__ || defined __UCLIBC__) && defined __linux__
++Do not use statvfs on systems with GNU libc on Linux, because that function
++stats all preceding entries in /proc/mounts, and that makes df hang if even
++one of the corresponding file systems is hard-mounted, but not available.
++statvfs in GNU libc on Hurd, BeOS, Haiku operates differently: it only makes
++a system call.
++#endif
++
+ #ifdef __osf__
+ "Do not use Tru64's statvfs implementation"
+ #endif
+diff --git a/src/filemanager/filegui.c b/src/filemanager/filegui.c
+index c9f7c42..1eab093 100644
+--- a/src/filemanager/filegui.c
++++ b/src/filemanager/filegui.c
+@@ -91,43 +91,14 @@
+ #endif
+ 
+ #if USE_STATVFS
++#define STRUCT_STATVFS struct statvfs
+ #if ! STAT_STATVFS && STAT_STATVFS64
+-#define STRUCT_STATVFS struct statvfs64
+ #define STATFS statvfs64
+ #else
+-#define STRUCT_STATVFS struct statvfs
+ #define STATFS statvfs
+-/* Return true if statvfs works.  This is false for statvfs on systems
+-   with GNU libc on Linux kernels before 2.6.36, which stats all
+-   preceding entries in /proc/mounts; that makes df hang if even one
+-   of the corresponding file systems is hard-mounted but not available.  */
+-#if ! (__linux__ && (__GLIBC__ || __UCLIBC__))
+-static int
+-statvfs_works (void)
+-{
+-    return 1;
+-}
+-#else
+-#include <string.h>             /* for strverscmp */
+-#include <sys/utsname.h>
+-#include <sys/statfs.h>
+-#define STAT_STATFS2_BSIZE 1
+-
+-static int
+-statvfs_works (void)
+-{
+-    static int statvfs_works_cache = -1;
+-    struct utsname name;
+-
+-    if (statvfs_works_cache < 0)
+-        statvfs_works_cache = (uname (&name) == 0 && 0 <= strverscmp (name.release, "2.6.36"));
+-    return statvfs_works_cache;
+-}
+-#endif
+ #endif
+ #else
+ #define STATFS statfs
+-#define STRUCT_STATVFS struct statfs
+ #if HAVE_OS_H                   /* BeOS */
+ /* BeOS has a statvfs function, but it does not return sensible values
+    for f_files, f_ffree and f_favail, and lacks f_type, f_basetype and
+@@ -266,21 +237,16 @@ typedef struct
+ static gboolean
+ filegui__check_attrs_on_fs (const char *fs_path)
+ {
++#ifdef USE_STATVFS
+     STRUCT_STATVFS stfs;
+ 
+     if (!setup_copymove_persistent_attr)
+         return FALSE;
+ 
+-#if USE_STATVFS && defined(STAT_STATVFS)
+-    if (statvfs_works () && statvfs (fs_path, &stfs) != 0)
+-        return TRUE;
+-#else
+-    if (STATFS (fs_path, &stfs) != 0)
++    if (statfs (fs_path, &stfs) != 0)
+         return TRUE;
+-#endif
+ 
+-#if (USE_STATVFS && defined(HAVE_STRUCT_STATVFS_F_TYPE)) || \
+-        (!USE_STATVFS && defined(HAVE_STRUCT_STATFS_F_TYPE))
++#ifdef __linux__
+     switch ((filegui_nonattrs_fs_t) stfs.f_type)
+     {
+     case MSDOS_SUPER_MAGIC:
+@@ -293,7 +259,8 @@ filegui__check_attrs_on_fs (const char *fs_path)
+     default:
+         break;
+     }
+-#elif defined(HAVE_STRUCT_STATVFS_F_FSTYPENAME) || defined(HAVE_STRUCT_STATFS_F_FSTYPENAME)
++#elif defined(HAVE_STRUCT_STATFS_F_FSTYPENAME) \
++      || defined(HAVE_STRUCT_STATVFS_F_FSTYPENAME)
+     if (strcmp (stfs.STATXFS_FILE_SYSTEM_TYPE_MEMBER_NAME, "msdos") == 0
+         || strcmp (stfs.STATXFS_FILE_SYSTEM_TYPE_MEMBER_NAME, "msdosfs") == 0
+         || strcmp (stfs.STATXFS_FILE_SYSTEM_TYPE_MEMBER_NAME, "ntfs") == 0
+@@ -309,6 +276,7 @@ filegui__check_attrs_on_fs (const char *fs_path)
+         || strcmp (stfs.STATXFS_FILE_SYSTEM_TYPE_MEMBER_NAME, "fuse") == 0)
+         return FALSE;
+ #endif
++#endif /* USE_STATVFS */
+ 
+     return TRUE;
+ }
+diff --git a/src/filemanager/mountlist.c b/src/filemanager/mountlist.c
+index 92399ae..171bfbd 100644
+--- a/src/filemanager/mountlist.c
++++ b/src/filemanager/mountlist.c
+@@ -270,37 +270,7 @@ me_remote (char const *fs_name, char const *fs_type _GL_UNUSED)
+    otherwise, use PROPAGATE_ALL_ONES.  */
+ #define PROPAGATE_TOP_BIT(x) ((x) | ~ (EXTRACT_TOP_BIT (x) - 1))
+ 
+-#ifdef STAT_STATVFS
+-/* Return true if statvfs works.  This is false for statvfs on systems
+-   with GNU libc on Linux kernels before 2.6.36, which stats all
+-   preceding entries in /proc/mounts; that makes df hang if even one
+-   of the corresponding file systems is hard-mounted but not available.  */
+-# if ! (__linux__ && (__GLIBC__ || __UCLIBC__))
+-static int
+-statvfs_works (void)
+-{
+-    return 1;
+-}
+-#else
+-#include <string.h> /* for strverscmp */
+-#include <sys/utsname.h>
+-#include <sys/statfs.h>
+-#define STAT_STATFS2_BSIZE 1
+-
+-static int
+-statvfs_works (void)
+-{
+-    static int statvfs_works_cache = -1;
+-    struct utsname name;
+-
+-    if (statvfs_works_cache < 0)
+-        statvfs_works_cache = (uname (&name) == 0 && 0 <= strverscmp (name.release, "2.6.36"));
+-     return statvfs_works_cache;
+-}
+-#endif
+-#endif
+-
+-#ifdef STAT_READ_FILSYS  /* SVR2 */
++#ifdef STAT_READ_FILSYS         /* SVR2 */
+ /* Set errno to zero upon EOF.  */
+ #define ZERO_BYTE_TRANSFER_ERRNO 0
+ 
+@@ -1330,32 +1300,18 @@ full_read (int fd, void *buf, size_t count)
+ static int
+ get_fs_usage (char const *file, char const *disk, struct fs_usage *fsp)
+ {
+-#ifdef STAT_STATVFS             /* POSIX, except pre-2.6.36 glibc/Linux */
++#ifdef STAT_STATVFS             /* POSIX, except glibc/Linux */
+ 
+-    if (statvfs_works ())
+-    {
+-        struct statvfs vfsd;
+-
+-        if (statvfs (file, &vfsd) < 0)
+-            return -1;
+-
+-        /* f_frsize isn't guaranteed to be supported.  */
+-        fsp->fsu_blocksize = (vfsd.f_frsize
+-                              ? PROPAGATE_ALL_ONES (vfsd.f_frsize)
+-                              : PROPAGATE_ALL_ONES (vfsd.f_bsize));
+-
+-        fsp->fsu_blocks = PROPAGATE_ALL_ONES (vfsd.f_blocks);
+-        fsp->fsu_bfree = PROPAGATE_ALL_ONES (vfsd.f_bfree);
+-        fsp->fsu_bavail = PROPAGATE_TOP_BIT (vfsd.f_bavail);
+-        fsp->fsu_bavail_top_bit_set = EXTRACT_TOP_BIT (vfsd.f_bavail) != 0;
+-        fsp->fsu_files = PROPAGATE_ALL_ONES (vfsd.f_files);
+-        fsp->fsu_ffree = PROPAGATE_ALL_ONES (vfsd.f_ffree);
+-        return 0;
+-    }
++    struct statvfs fsd;
+ 
+-#endif
++    if (statvfs (file, &fsd) < 0)
++        return -1;
++
++    /* f_frsize isn't guaranteed to be supported.  */
++    fsp->fsu_blocksize = (fsd.f_frsize
++                          ? PROPAGATE_ALL_ONES (fsd.f_frsize) : PROPAGATE_ALL_ONES (fsd.f_bsize));
+ 
+-#if defined STAT_STATVFS64            /* AIX */
++#elif defined STAT_STATVFS64    /* AIX */
+ 
+     struct statvfs64 fsd;
+ 
+@@ -1482,7 +1438,7 @@ get_fs_usage (char const *file, char const *disk, struct fs_usage *fsp)
+ 
+ #endif
+ 
+-#if (defined STAT_STATVFS64 \
++#if (defined STAT_STATVFS || defined STAT_STATVFS64 \
+      || (!defined STAT_STATFS2_FS_DATA && !defined STAT_READ_FILSYS))
+ 
+     fsp->fsu_blocks = PROPAGATE_ALL_ONES (fsd.f_blocks);
