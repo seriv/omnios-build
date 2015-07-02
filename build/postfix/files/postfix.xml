@@ -13,7 +13,7 @@
             <service_fmri value="svc:/system/filesystem/local"/>
         </dependency>
         <exec_method type="method" name="start"
-            exec="/opt/omni/libexec/postfix/master" timeout_seconds="60"/>
+            exec="/usr/libexec/postfix/master" timeout_seconds="60"/>
         <exec_method type="method" name="stop" exec=":kill"
             timeout_seconds="60"/>
         <property_group name="startd" type="framework">
@@ -22,7 +22,7 @@
         </property_group>
         <property_group name="application" type="application">
             <propval name="config_file" type="astring"
-                value="/opt/postfix/main.cf"/>
+                value="/etc/postfix/main.cf"/>
         </property_group>
         <stability value="Evolving"/>
         <template>
