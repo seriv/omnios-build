@@ -36,11 +36,7 @@ LDFLAGS64="-L/opt/omni/lib/amd64/ -R/opt/omni/lib/amd64/"
 LDFLAGS32="-L/opt/omni/lib -R/opt/omni/lib"
 
 PROG=dovecot    # App name
-VER=2.2.15      # App version
-VERHUMAN=$VER   # Human-readable version
-
-PROG=dovecot    # App name
-VER=2.2.15      # App version
+VER=2.2.18      # App version
 VERHUMAN=$VER   # Human-readable version
 PVER=1          # Branch (set in config.sh, override here if needed)
 PKG=mail/dovecot # Package name (e.g. library/foo)
