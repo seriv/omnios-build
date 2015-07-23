@@ -56,6 +56,17 @@ PATCHDIR=patches
 NOSCRIPTSTUB=
 
 #############################################################################
+# The version of certain software that's *installed* matters.  We don't yet
+# have a sophisticated build-certain-things-first bootstrap for omnios-build.
+# We must sometimes determine or even hardcode things about our build system.
+#############################################################################
+
+# libffi --> use pkg(5) to determine what we're running:
+FFIVERS=`pkg list libffi | grep libffi | awk '{print $2}' | \
+	awk -F- '{print $1}'`
+
+
+#############################################################################
 # Perl stuff
 #############################################################################
 
@@ -80,6 +91,7 @@ export PERL_MM_USE_DEFAULT=true
 # Unset in a build script to skip tests
 PERL_MAKE_TEST=1
 
+
 #############################################################################
 # Python
 #############################################################################
@@ -100,7 +112,6 @@ BUNZIP2=bunzip2
 XZCAT=xzcat
 UNZIP=unzip
 AWK=gawk
-SUDO=sudo
 
 # Figure out number of logical CPUs for use with parallel gmake jobs (-j)
 # Default to 1.5*nCPUs as we assume the build machine is 100% devoted to
