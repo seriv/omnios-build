@@ -21,7 +21,7 @@
 # CDDL HEADER END
 #
 #
-# Copyright 2011-2012 OmniTI Computer Consulting, Inc.  All rights reserved.
+# Copyright 2015 OmniTI Computer Consulting, Inc.  All rights reserved.
 # Use is subject to license terms.
 # Copyright (c) 2014 by Delphix. All rights reserved.
 #
@@ -160,11 +160,11 @@ ask_to_continue() {
 }
 
 ask_to_install() {
-    local PKG=$1
-    local MSG=$2
+    PKG=$1
+    MSG=$2
     if [[ -n "$AUTOINSTALL" ]]; then
         logmsg "Auto-installing $PKG..."
-        logcmd $SUDO pkg install $PKG || logerr "pkg install $PKG failed"
+        logcmd sudo pkg install $PKG || logerr "pkg install $PKG failed"
         return
     fi
     if [[ -n "$BATCH" ]]; then
@@ -173,7 +173,7 @@ ask_to_install() {
     fi
     ask_to_continue_ "$MSG " "Install/Abort?" "i/a" "[iIaA]"
     if [[ "$REPLY" == "i" || "$REPLY" == "I" ]]; then
-        logcmd $SUDO pkg install $PKG || logerr "pkg install failed"
+        logcmd sudo pkg install $PKG || logerr "pkg install failed"
     else
         logmsg "===== Build aborted ====="
         exit 1
@@ -206,8 +206,7 @@ url_encode() {
 LANG=C
 export LANG
 # Set the path - This can be overriden/extended in the build script
-#  - gcc will be prepended after loading config.sh for RELVER definition
-PATH="/usr/ccs/bin:/usr/bin:/usr/sbin:/usr/gnu/bin:/usr/sfw/bin"
+PATH="/opt/gcc-4.8.1/bin:/usr/ccs/bin:/usr/bin:/usr/sbin:/usr/gnu/bin:/usr/sfw/bin"
 export PATH
 # The dir where this file is located - used for sourcing further files
 MYDIR=$PWD/`dirname $BASH_SOURCE[0]`
@@ -224,36 +223,6 @@ SRCDIR=$PWD/`dirname $0`
 # Platform information
 SUNOSVER=`uname -r` # e.g. 5.11
 
-#############################################################################
-# release-specific userland GCC path/dependency
-#############################################################################
-case "$RELVER" in
-    151002)
-        GCCPKG="developer/gcc46"
-        GCCPATH="/opt/gcc-4.6.3/bin"
-        ;;
-    151004)
-        GCCPKG="developer/gcc46"
-        GCCPATH="/opt/gcc-4.6.3/bin"
-        ;;
-    151006)
-        GCCPKG="developer/gcc47"
-        GCCPATH="/opt/gcc-4.7.2/bin"
-        ;;
-    151008)
-        GCCPKG="developer/gcc48"
-        GCCPATH="/opt/gcc-4.8.1/bin"
-        ;;
-    *)
-        echo "update lib/functions.sh this for unrecognized release $RELVER"
-        exit 2
-        ;;
-esac
-
-# update PATH with the designated GCC for this release
-PATH="$GCCPATH:$PATH"
-export PATH
-
 if [[ -f $LOGFILE ]]; then
     mv $LOGFILE $LOGFILE.1
 fi
@@ -262,18 +231,18 @@ shift $((OPTIND - 1))
 
 BasicRequirements(){
     local needed=""
-    [[ -x $GCCPATH/gcc ]] || needed+=" $GCCPKG"
+    [[ -x /opt/gcc-4.8.1/bin/gcc ]] || needed+=" developer/gcc48"
     [[ -x /usr/bin/ar ]] || needed+=" developer/object-file"
     [[ -x /usr/bin/ld ]] || needed+=" developer/linker"
     [[ -f /usr/lib/crt1.o ]] || needed+=" developer/library/lint"
     [[ -x /usr/bin/gmake ]] || needed+=" developer/build/gnu-make"
     [[ -f /usr/include/sys/types.h ]] || needed+=" system/header"
-    [[ -f /usr/include/math.h ]] || needed+=" system/library/math/header-math"
+    [[ -f /usr/include/math.h ]] || needed+=" system/library/math"
     if [[ -n "$needed" ]]; then
         logmsg "You appear to be missing some basic build requirements."
         logmsg "To fix this run:"
         logmsg " "
-        logmsg "  $SUDO pkg install$needed"
+        logmsg "  sudo pkg install$needed"
         if [[ -n "$BATCH" ]]; then
             logmsg "===== Build aborted ====="
             exit 1
@@ -514,7 +483,7 @@ get_resource() {
             logcmd cp $MIRROR/$RESOURCE .
             ;;
         *)
-            URLPREFIX=http://$MIRROR
+            URLPREFIX=$MIRROR
             $WGET -a $LOGFILE $URLPREFIX/$RESOURCE
             ;;
     esac
@@ -781,7 +750,8 @@ make_package() {
     fi
     if [[ -n "$DESTDIR" ]]; then
         logcmd $PKGSEND -s $PKGSRVR publish -d $DESTDIR -d $TMPDIR/$BUILDDIR \
-            -d $SRCDIR $P5M_FINAL || logerr "------ Failed to publish package"
+            -d $SRCDIR -T \*.py $P5M_FINAL || \
+	    logerr "------ Failed to publish package"
     else
         # If we're a metapackage (no DESTDIR) then there are no directories to check
         logcmd $PKGSEND -s $PKGSRVR publish $P5M_FINAL || \
@@ -811,17 +781,17 @@ make_isaexec_stub_arch() {
     for file in $1/*; do
         [[ -f $file ]] || continue # Deals with empty dirs & non-files
         # Check to make sure we don't have a script
-        read -n 5 < $file
+        read -n 4 < $file
         file=`echo $file | sed -e "s/$1\///;"`
-        # Skip if we already made a stub for this file
-        [[ -f $file ]] && continue
         # Only copy non-binaries if we set NOSCRIPTSTUB
         if [[ $REPLY != $'\177'ELF && -n "$NOSCRIPTSTUB" ]]; then
             logmsg "------ Non-binary file: $file - copying instead"
-            cp $1/$file .
+            cp $1/$file . && rm $1/$file
             chmod +x $file
             continue
         fi
+        # Skip if we already made a stub for this file
+        [[ -f $file ]] && continue
         logmsg "------ $file"
         # Run the makeisa.sh script
         CC=$CC \
@@ -942,6 +912,41 @@ make_install_in() {
         logerr "------ Make install in $1 failed"
 }
 
+make_lintlibs() {
+    logmsg "Making lint libraries"
+
+    LINTLIB=$1
+    LINTLIBDIR=$2
+    LINTINCDIR=$3
+    LINTINCFILES=$4
+
+    [[ -z ${LINTLIB} ]] && logerr "not lint library specified"
+    [[ -z ${LINTINCFILES} ]] && LINTINCFILES="*.h"
+
+    cat <<EOF > ${DTMPDIR}/${PKGD}_llib-l${LINTLIB}
+/* LINTLIBRARY */
+/* PROTOLIB1 */
+#include <sys/types.h>
+#undef _LARGEFILE_SOURCE
+EOF
+    pushd ${DESTDIR}${LINTINCDIR} > /dev/null
+	sh -c "eval /usr/gnu/bin/ls -U ${LINTINCFILES}" | \
+	    sed -e 's/\(.*\)/#include <\1>/' >> ${DTMPDIR}/${PKGD}_llib-l${LINTLIB}
+    popd > /dev/null
+
+    pushd ${DESTDIR}${LINTLIBDIR} > /dev/null
+    logcmd /opt/sunstudio12.1/bin/lint -nsvx -I${DESTDIR}${LINTINCDIR} \
+	    -o ${LINTLIB} ${DTMPDIR}/${PKGD}_llib-l${LINTLIB} || \
+	    logerr "failed to generate 32bit lint library ${LINTLIB}"
+    popd > /dev/null
+
+    pushd ${DESTDIR}${LINTLIBDIR}/amd64 > /dev/null
+    logcmd /opt/sunstudio12.1/bin/lint -nsvx -I${DESTDIR}${LINTINCDIR} -m64 \
+	    -o ${LINTLIB} ${DTMPDIR}/${PKGD}_llib-l${LINTLIB} || \
+	    logerr "failed to generate 64bit lint library ${LINTLIB}"
+    popd > /dev/null
+}
+
 build() {
     if [[ $BUILDARCH == "32" || $BUILDARCH == "both" ]]; then
         build32
@@ -981,7 +986,7 @@ pre_python_32() {
     logmsg "prepping 32bit python build"
 }
 pre_python_64() {
-    logmsg "prepping 32bit python build"
+    logmsg "prepping 64bit python build"
 }
 python_build() {
     if [[ -z "$PYTHON" ]]; then logerr "PYTHON not set"; fi
@@ -994,22 +999,22 @@ python_build() {
     export ISALIST
     pre_python_32
     logmsg "--- setup.py (32) build"
-    logcmd $PYTHON ./setup.py build ||
+    logcmd $PYTHON ./setup.py build $PYBUILD32OPTS ||
         logerr "--- build failed"
     logmsg "--- setup.py (32) install"
     logcmd $PYTHON \
-        ./setup.py install --root=$DESTDIR ||
+        ./setup.py install --root=$DESTDIR $PYINST32OPTS ||
         logerr "--- install failed"
 
     ISALIST="amd64 i386"
     export ISALIST
     pre_python_64
     logmsg "--- setup.py (64) build"
-    logcmd $PYTHON ./setup.py build ||
+    logcmd $PYTHON ./setup.py build $PYBUILD64OPTS ||
         logerr "--- build failed"
     logmsg "--- setup.py (64) install"
     logcmd $PYTHON \
-        ./setup.py install --root=$DESTDIR ||
+        ./setup.py install --root=$DESTDIR $PYINST64OPTS ||
         logerr "--- install failed"
     popd > /dev/null
 
@@ -1221,13 +1226,14 @@ save_function() {
 # Called by builds that need a PREBUILT_ILLUMOS actually finished.
 wait_for_prebuilt() {
     if [ ! -d ${PREBUILT_ILLUMOS:-/dev/null} ]; then
-	echo "wait_for_prebuilt() called w/o PREBUILT_ILLUMOS. Bailing."
+	logmsg "wait_for_prebuilt() called w/o PREBUILT_ILLUMOS. Bailing."
 	clean_up
 	exit 1
     fi
 
     # -h means symbolic link. That's what nightly does.
     if [ ! -h $PREBUILT_ILLUMOS/log/nightly.lock ]; then
+	logmsg "$PREBUILT_ILLUMOS already built (no nightly.lock present...)"
 	return
     fi
 
@@ -1236,7 +1242,8 @@ wait_for_prebuilt() {
     nightly_pid=`ls -lt $PREBUILT_ILLUMOS/log/nightly.lock | awk -F. '{print $4}'`
     # Wait for nightly to be finished if it's running.
     logmsg "Waiting for illumos nightly build $nightly_pid to be finished."
-    pwait $nightly_pid
+    logmsg "Amount of time waiting for illumos nightly follows."
+    logcmd /bin/time pwait $nightly_pid
     if [ -h $PREBUILT_ILLUMOS/log/nightly.lock ]; then
         logmsg "Nightly lock present, but build not running.  Bailing."
         if [[ -z $BATCH ]]; then
