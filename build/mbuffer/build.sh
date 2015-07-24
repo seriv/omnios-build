@@ -28,9 +28,9 @@
 . ../../lib/functions.sh
 
 PROG=mbuffer
-VER=20141227
+VER=20150412
 VERHUMAN=$VER
-PKG=system/mbuffer
+PKG=csd/system/mbuffer
 SUMMARY="measuring buffer to be used with pipes"
 DESC="mbuffer is a tool for buffering data streams with a large set of unique features:\
 direct support for TCP based network targets (IPv4 and IPv6)\
