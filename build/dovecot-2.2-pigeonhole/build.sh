@@ -31,16 +31,16 @@ PROG=dovecot-2.2-pigeonhole
 VER=0.4.8       # App version
 VERHUMAN=$VER   # Human-readable version
 PVER=1          # Branch (set in config.sh, override here if needed)
-PKG=mail/pigeonhole
+PKG=csd/mail/pigeonhole
 SUMMARY="Sieve and managesieve plugin for dovecot"
 DESC="This package provied sieve and managesieve plugin for dovecot LDA and LMTP"
 
-BUILD_DEPENDS_IPS="mail/dovecot"
-RUN_DEPENDS_IPS="mail/dovecot"
-LDFLAGS32="-L/usr/lib/dovecot -R/usr/lib/dovecot"
-LDFLAGS64="-L/usr/lib/amd64/dovecot -R/usr/lib/amd64/dovecot"
-CONFIGURE_OPTS_32="$CONFIGURE_OPTS_32 --with-dovecot=/usr/lib/dovecot"
-CONFIGURE_OPTS_64="$CONFIGURE_OPTS_64 --with-dovecot=/usr/lib/amd64/dovecot"
+BUILD_DEPENDS_IPS="csd/mail/dovecot"
+RUN_DEPENDS_IPS="csd/mail/dovecot"
+LDFLAGS32="-L/opt/csd/lib/dovecot -R/opt/csd/lib/dovecot"
+LDFLAGS64="-L/opt/csd/lib/amd64/dovecot -R/opt/csd/lib/amd64/dovecot"
+CONFIGURE_OPTS_32="$CONFIGURE_OPTS_32 --with-dovecot=/opt/csd/lib/dovecot"
+CONFIGURE_OPTS_64="$CONFIGURE_OPTS_64 --with-dovecot=/opt/csd/lib/amd64/dovecot"
 
 init
 download_source pigeonhole $PROG $VER
