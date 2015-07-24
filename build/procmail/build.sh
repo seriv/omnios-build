@@ -31,7 +31,7 @@ PROG=procmail   # App name
 VER=3.22        # App version
 VERHUMAN=$VER   # Human-readable version
 #PVER=          # Branch (set in config.sh, override here if needed)
-PKG=mail/procmail    # Package name (e.g. library/foo)
+PKG=csd/mail/procmail    # Package name (e.g. library/foo)
 SUMMARY="Mail processing program"
 DESC=" Procmail can be used to create mail-servers, mailing lists, sort your \
 incoming mail into separate folders/files (real convenient when subscribing \
@@ -39,7 +39,6 @@ to one or more mailing lists or for prioritising your mail), preprocess \
 your mail, start any programs upon mail arrival (e.g. to generate different \
 chimes on your workstation for different types of mail) or selectively \
 forward certain incoming mail automatically to someone."
-PREFIX="/usr"
 
 
 configure64() {
