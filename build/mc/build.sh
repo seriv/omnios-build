@@ -31,11 +31,18 @@ PROG=mc         # App name
 VER=4.8.13      # App version
 VERHUMAN=$VER   # Human-readable version
 #PVER=          # Branch (set in config.sh, override here if needed)
-PKG=file/mc     # Package name (e.g. library/foo)
+PKG=csd/file/mc     # Package name (e.g. library/foo)
 SUMMARY="GNU Midnight Commander is a visual file manager"      # One-liner, must be filled in
-BUILD_DEPENDS_IPS="system/pkg-config"
-DEPENDS_IPS="library/slang"
+BUILD_DEPENDS_IPS="developer/pkg-config"
+DEPENDS_IPS="csd/library/slang"
 DESC="Midnight Commander is a feature rich full-screen text mode application that allows you to copy, move and delete files and whole directory trees, search for files and run commands in the subshell. Internal viewer and editor are included."         # Longer description, must be filled in
+
+#BUILDARCH="64"
+#PKG_CONFIG_PATH="/opt/csd/lib/amd64/pkgconfig/"
+export PKG_CONFIG_PATH="/opt/csd/lib/pkgconfig:$PKG_CONFIG"
+CPPFLAGS="-I/opt/csd/include"
+LDFLAGS32="-L/opt/csd/lib/ -R/opt/csd/lib/"
+LDFLAGS64="-L/opt/csd/lib/amd64/ -R/opt/csd/lib/amd64/"
 
 init
 download_source $PROG $PROG $VER
