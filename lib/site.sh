@@ -19,3 +19,9 @@
 # tip, you MUST uncomment it, or KVM/KVM-cmd won't build.
 #KVM_ROLLBACK=43aa6602f0d68ff7e032aad06645e34e9921d976
 #KVM_CMD_ROLLBACK=1c6181be55d1cadc4426069960688307a6083131
+
+export PATH=$PATH:/opt/csd/bin
+
+PREFIX=/opt/csd
+reset_configure_opts
+
