@@ -31,7 +31,7 @@ PROG=netperf    # App name
 VER=2.6.0       # App version
 VERHUMAN=$VER   # Human-readable version
 #PVER=          # Branch (set in config.sh, override here if needed)
-PKG=network/netperf            # Package name (e.g. library/foo)
+PKG=csd/network/netperf            # Package name (e.g. library/foo)
 SUMMARY="netperf is a TCP/UDP/sockets/etc performance benchmark"      # One-liner, must be filled in
 DESC="Netperf is a benchmark that can be used to measure the performance of many different types of networking. \
 It provides tests for both unidirecitonal throughput, and end-to-end latency. \
