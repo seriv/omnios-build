@@ -31,7 +31,7 @@ PROG=slang      # App name
 VER=2.2.4       # App version
 VERHUMAN=$VER   # Human-readable version
 #PVER=          # Branch (set in config.sh, override here if needed)
-PKG=library/slang # Package name (e.g. library/foo)
+PKG=csd/library/slang # Package name (e.g. library/foo)
 SUMMARY="s-lang is a multi-platform programmer's library"      # One-liner, must be filled in
 DESC="s-lang provides facilities required by interactive applications such as display/screen management, keyboard input, keymaps, and so on."         # Longer description, must be filled in
 
