@@ -28,10 +28,10 @@
 . ../../lib/functions.sh
 
 PROG=postfix    # App name
-VER=3.0.1            # App version
+VER=3.0.2            # App version
 VERHUMAN=$VER   # Human-readable version
 #PVER=          # Branch (set in config.sh, override here if needed)
-PKG=mail/postfix            # Package name (e.g. library/foo)
+PKG=csd/mail/postfix            # Package name (e.g. library/foo)
 SUMMARY="Postfix mail server"      # One-liner, must be filled in
 DESC="Wietse Venema's mail server alternative to Sendmail"         # Longer description, must be filled in
 
@@ -45,13 +45,13 @@ configure32() {
 configure64() {
     logmsg "--- Configure (make makefiles)"
     logcmd $MAKE makefiles CCARGS='-DNO_NIS \
-        -DDEF_COMMAND_DIR=\"/usr/sbin\" \
+        -DDEF_COMMAND_DIR=\"/opt/csd/sbin\" \
         -DDEF_CONFIG_DIR=\"/etc/postfix\" \
-        -DDEF_DAEMON_DIR=\"/usr/libexec/postfix\" \
-        -DDEF_MAILQ_PATH=\"/usr/bin/mailq\" \
-        -DDEF_MANPAGE_DIR=\"/usr/share/man\" \
-        -DDEF_NEWALIAS_PATH=\"/usr/bin/newaliases\" \
-        -DDEF_SENDMAIL_PATH=\"/usr/sbin/sendmail\" \
+        -DDEF_DAEMON_DIR=\"/opt/csd/libexec/postfix\" \
+        -DDEF_MAILQ_PATH=\"/opt/csd/bin/mailq\" \
+        -DDEF_MANPAGE_DIR=\"/opt/csd/share/man\" \
+        -DDEF_NEWALIAS_PATH=\"/opt/csd/bin/newaliases\" \
+        -DDEF_SENDMAIL_PATH=\"/opt/csd/sbin/sendmail\" \
         ' || logerr "Failed make makefiles command"
 }
 
