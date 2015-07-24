@@ -26,20 +26,20 @@
 #
 # Load support functions
 . ../../lib/functions.sh
-BUILD_DEPENDS_IPS="developer/sunstudio12.1 omniti/network/openldap-client"
-DEPENDS_IPS="omniti/network/openldap-client"
+BUILD_DEPENDS_IPS="developer/sunstudio12.1 csd/network/openldap"
+DEPENDS_IPS="network/openldap"
 CC=/opt/sunstudio12.1/bin/cc; export CC
 CONFIGURE_OPTS="--with-ldap=plugin"
-CPPFLAGS64="-I/opt/omni/include/amd64/"
-CPPFLAGS32="-I/opt/omni/include"
-LDFLAGS64="-L/opt/omni/lib/amd64/ -R/opt/omni/lib/amd64/"
-LDFLAGS32="-L/opt/omni/lib -R/opt/omni/lib"
+CPPFLAGS64="-I/opt/csd/include/amd64/"
+CPPFLAGS32="-I/opt/csd/include"
+LDFLAGS64="-L/opt/csd/lib/amd64/ -R/opt/csd/lib/amd64/"
+LDFLAGS32="-L/opt/csd/lib -R/opt/csd/lib"
 
 PROG=dovecot    # App name
 VER=2.2.18      # App version
 VERHUMAN=$VER   # Human-readable version
 PVER=1          # Branch (set in config.sh, override here if needed)
-PKG=mail/dovecot # Package name (e.g. library/foo)
+PKG=csd/mail/dovecot # Package name (e.g. library/foo)
 SUMMARY="Dovecot is an open source IMAP and POP3 email server"      # One-liner, must be filled in
 DESC="Dovecot is among the highest performing IMAP servers while still supporting the standard mbox and Maildir formats. The mailboxes are transparently indexed, which gives Dovecot its good performance while still providing full compatibility with existing mailbox handling tools."         # Longer description, must be filled in
 
