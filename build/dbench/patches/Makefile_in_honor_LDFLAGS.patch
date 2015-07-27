@@ -1,0 +1,10 @@
+--- dbench-20140714/Makefile.in.orig	Mon Jul 27 15:51:53 2015
++++ dbench-20140714/Makefile.in	Mon Jul 27 15:52:42 2015
+@@ -15,6 +15,7 @@
+ DESTDIR=/
+ CC=@CC@
+ CFLAGS=@CFLAGS@ -I. -DVERSION=\"$(VERSION)\" -DDATADIR=\"$(datadir)\"
++LDFLAGS=@LDFLAGS@
+ EXEEXT=@EXEEXT@
+ 
+ DB_OBJS = fileio.o util.o dbench.o child.o system.o snprintf.o sockio.o nfsio.o libnfs-glue.o socklib.o @LINUXSCSI@ libiscsi.o @SMBO@

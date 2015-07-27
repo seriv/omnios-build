@@ -1,0 +1,2 @@
+dbench_h_defineMAX.patch
+Makefile_in_honor_LDFLAGS.patch

@@ -21,23 +21,21 @@
 # CDDL HEADER END
 #
 #
-# Copyright 2011-2012 OmniTI Computer Consulting, Inc.  All rights reserved.
+# Copyright 2011-2013 OmniTI Computer Consulting, Inc.  All rights reserved.
 # Use is subject to license terms.
 #
 # Load support functions
 . ../../lib/functions.sh
 
-PROG=pkg-config # App name
-VER=0.28        # App version
+PROG=openldap      # App name
+VER=2.4.41      # App version
 VERHUMAN=$VER   # Human-readable version
 #PVER=          # Branch (set in config.sh, override here if needed)
-PKG=system/pkg-config # Package name (e.g. library/foo)
-SUMMARY="gnu pkg-config"      # One-liner, must be filled in
-DESC="pkg-config is a helper tool used when compiling applications and libraries. It helps you insert the correct compiler options on the command line rather than hard-coding values"
+PKG=csd/network/openldap # Package name (e.g. library/foo)
+SUMMARY="LDAP Directory Software Suite"      # One-liner, must be filled in
+DESC="OpenLDAP Software is an Open Source suite of directory software developed by the Internet community."         # Longer description, must be filled in
 
-GLIB_CFLAGS='-I/usr/include/amd64/glib-2.0 -I/usr/lib/amd64/glib-2.0/include'
-GLIB_LIBS='-L/usr/lib/amd64 -lglib-2.0'
-export GLIB_CFLAGS GLIB_LIBS
+CONFIGURE_OPTS="--disable-slapd --disable-slurpd --with-tls=openssl"
 
 init
 download_source $PROG $PROG $VER
@@ -46,7 +44,7 @@ prep_build
 build
 make_isa_stub
 make_package
-clean_up
+#clean_up
 
 # Vim hints
 # vim:ts=4:sw=4:et:
