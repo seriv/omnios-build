@@ -30,9 +30,8 @@ BUILD_DEPENDS_IPS="developer/sunstudio12.1 csd/network/openldap"
 DEPENDS_IPS="network/openldap"
 CC=/opt/sunstudio12.1/bin/cc; export CC
 CONFIGURE_OPTS="--with-ldap=plugin"
-CPPFLAGS64="-I/opt/csd/include/amd64/"
-CPPFLAGS32="-I/opt/csd/include"
-LDFLAGS64="-L/opt/csd/lib/amd64/ -R/opt/csd/lib/amd64/"
+CPPFLAGS="-I/opt/csd/include"
+LDFLAGS64="-L/opt/csd/lib/amd64 -R/opt/csd/lib/amd64"
 LDFLAGS32="-L/opt/csd/lib -R/opt/csd/lib"
 
 PROG=dovecot    # App name
@@ -43,6 +42,18 @@ PKG=csd/mail/dovecot # Package name (e.g. library/foo)
 SUMMARY="Dovecot is an open source IMAP and POP3 email server"      # One-liner, must be filled in
 DESC="Dovecot is among the highest performing IMAP servers while still supporting the standard mbox and Maildir formats. The mailboxes are transparently indexed, which gives Dovecot its good performance while still providing full compatibility with existing mailbox handling tools."         # Longer description, must be filled in
 
+
+service_configs() {
+    logmsg "Installing SMF Manifest and method"
+    logcmd mkdir -p $DESTDIR/lib/svc/manifest/network/
+    logcmd mkdir -p $DESTDIR/lib/svc/method/
+    logcmd cp $SRCDIR/files/dovecot.xml \
+        $DESTDIR/lib/svc/manifest/network/dovecot.xml ||
+        logerr "Failed to install SMF manifest"
+    logcmd cp $SRCDIR/files/dovecot \
+        $DESTDIR/lib/svc/method/dovecot ||
+        logerr "Failed to install service method"
+}
 
 init
 download_source $PROG $PROG $VER
