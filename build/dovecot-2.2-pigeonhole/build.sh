@@ -28,7 +28,7 @@
 . ../../lib/functions.sh
 
 PROG=dovecot-2.2-pigeonhole
-VER=0.4.8       # App version
+VER=0.4.13      # App version
 VERHUMAN=$VER   # Human-readable version
 PVER=1          # Branch (set in config.sh, override here if needed)
 PKG=csd/mail/pigeonhole

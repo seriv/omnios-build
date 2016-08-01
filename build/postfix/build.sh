@@ -28,9 +28,9 @@
 . ../../lib/functions.sh
 
 PROG=postfix    # App name
-VER=3.0.2            # App version
+VER=3.1.0       # App version
 VERHUMAN=$VER   # Human-readable version
-#PVER=          # Branch (set in config.sh, override here if needed)
+PVER=2.151014   # Branch (set in config.sh, override here if needed)
 PKG=csd/mail/postfix            # Package name (e.g. library/foo)
 SUMMARY="Postfix mail server"      # One-liner, must be filled in
 DESC="Wietse Venema's mail server alternative to Sendmail"         # Longer description, must be filled in
@@ -44,14 +44,17 @@ configure32() {
 
 configure64() {
     logmsg "--- Configure (make makefiles)"
-    logcmd $MAKE makefiles CCARGS='-m64 -DNO_NIS \
-        -DDEF_COMMAND_DIR=\"/opt/csd/sbin\" \
-        -DDEF_CONFIG_DIR=\"/etc/postfix\" \
-        -DDEF_DAEMON_DIR=\"/opt/csd/libexec/postfix\" \
-        -DDEF_MAILQ_PATH=\"/opt/csd/bin/mailq\" \
-        -DDEF_MANPAGE_DIR=\"/opt/csd/share/man\" \
-        -DDEF_NEWALIAS_PATH=\"/opt/csd/bin/newaliases\" \
-        -DDEF_SENDMAIL_PATH=\"/opt/csd/sbin/sendmail\" \
+    logcmd $MAKE makefiles AUXLIBS="-lssl -lcrypto" \
+         AUXLIBS_LDAP="-L/opt/csd/lib/amd64 -R/opt/csd/lib/amd64 -lldap \
+        -L/opt/csd/lib/amd64 -R/opt/csd/lib/amd64 -llber" \
+         CCARGS='-m64 -I/opt/csd/include -DNO_NIS -DUSE_TLS -DHAS_LDAP\
+        -DDEF_COMMAND_DIR=\"/opt/csd/sbin\"\
+        -DDEF_CONFIG_DIR=\"/etc/postfix\"\
+        -DDEF_DAEMON_DIR=\"/opt/csd/libexec/postfix\"\
+        -DDEF_MAILQ_PATH=\"/opt/csd/bin/mailq\"\
+        -DDEF_MANPAGE_DIR=\"/opt/csd/share/man\"\
+        -DDEF_NEWALIAS_PATH=\"/opt/csd/bin/newaliases\"\
+        -DDEF_SENDMAIL_PATH=\"/opt/csd/sbin/sendmail\"\
         ' || logerr "Failed make makefiles command"
 }
 
