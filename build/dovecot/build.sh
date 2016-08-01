@@ -35,9 +35,9 @@ LDFLAGS64="-L/opt/csd/lib/amd64 -R/opt/csd/lib/amd64"
 LDFLAGS32="-L/opt/csd/lib -R/opt/csd/lib"
 
 PROG=dovecot    # App name
-VER=2.2.18      # App version
+VER=2.2.23      # App version
 VERHUMAN=$VER   # Human-readable version
-PVER=1          # Branch (set in config.sh, override here if needed)
+PVER=2.151014   # Branch (set in config.sh, override here if needed)
 PKG=csd/mail/dovecot # Package name (e.g. library/foo)
 SUMMARY="Dovecot is an open source IMAP and POP3 email server"      # One-liner, must be filled in
 DESC="Dovecot is among the highest performing IMAP servers while still supporting the standard mbox and Maildir formats. The mailboxes are transparently indexed, which gives Dovecot its good performance while still providing full compatibility with existing mailbox handling tools."         # Longer description, must be filled in
