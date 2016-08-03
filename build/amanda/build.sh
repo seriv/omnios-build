@@ -45,6 +45,7 @@ be installed on both AMANDA clients and AMANDA servers.  Note that you \
 will have to install the amanda-client and/or amanda-server packages as \
 well"
 
+BUILDARCH=32
 BUILD_DEPENDS_IPS=
 RUN_DEPENDS_IPS=
 CONFIGURE_OPTS='--disable-installperms'
