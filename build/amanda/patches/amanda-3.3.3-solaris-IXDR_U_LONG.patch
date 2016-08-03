@@ -1,0 +1,63 @@
+diff -Naur amanda-3.3.3.orig/ndmp-src/ndmp2_xdr.c amanda-3.3.3/ndmp-src/ndmp2_xdr.c
+--- amanda-3.3.3.orig/ndmp-src/ndmp2_xdr.c	2013-01-10 12:56:59.000000000 +0000
++++ amanda-3.3.3/ndmp-src/ndmp2_xdr.c	2016-08-02 15:18:17.669231920 +0000
+@@ -4,6 +4,17 @@
+  */
+ 
+ #include "ndmp2.h"
++
++#ifndef IXDR_GET_LONG
++#define IXDR_GET_LONG(buf)              ((long)ntohl((ulong_t)*(buf)++))
++#define  IXDR_GET_U_LONG(buf)            ((ulong_t)IXDR_GET_LONG(buf))
++
++#endif
++#ifndef IXDR_PUT_LONG
++#define IXDR_PUT_LONG(buf, v)           (*(buf)++ = (long)htonl((ulong_t)v))
++#define  IXDR_PUT_U_LONG(buf, v)         IXDR_PUT_LONG((buf), ((long)(v)))
++#endif
++
+ #ifndef NDMOS_OPTION_NO_NDMP2
+ #define ndmp2_u_quad unsigned long long
+ extern bool_t xdr_ndmp2_u_quad();
+diff -Naur amanda-3.3.3.orig/ndmp-src/ndmp3_xdr.c amanda-3.3.3/ndmp-src/ndmp3_xdr.c
+--- amanda-3.3.3.orig/ndmp-src/ndmp3_xdr.c	2013-01-10 12:56:59.000000000 +0000
++++ amanda-3.3.3/ndmp-src/ndmp3_xdr.c	2016-08-02 15:18:50.445264128 +0000
+@@ -4,6 +4,17 @@
+  */
+ 
+ #include "ndmp3.h"
++
++#ifndef IXDR_GET_LONG
++#define IXDR_GET_LONG(buf)              ((long)ntohl((ulong_t)*(buf)++))
++#define  IXDR_GET_U_LONG(buf)            ((ulong_t)IXDR_GET_LONG(buf))
++
++#endif
++#ifndef IXDR_PUT_LONG
++#define IXDR_PUT_LONG(buf, v)           (*(buf)++ = (long)htonl((ulong_t)v))
++#define  IXDR_PUT_U_LONG(buf, v)         IXDR_PUT_LONG((buf), ((long)(v)))
++#endif
++
+ #ifndef NDMOS_OPTION_NO_NDMP3
+ #define ndmp3_u_quad unsigned long long
+ extern bool_t xdr_ndmp3_u_quad();
+diff -Naur amanda-3.3.3.orig/ndmp-src/ndmp4_xdr.c amanda-3.3.3/ndmp-src/ndmp4_xdr.c
+--- amanda-3.3.3.orig/ndmp-src/ndmp4_xdr.c	2013-01-10 12:56:59.000000000 +0000
++++ amanda-3.3.3/ndmp-src/ndmp4_xdr.c	2016-08-02 15:19:03.565320490 +0000
+@@ -4,6 +4,17 @@
+  */
+ 
+ #include "ndmp4.h"
++
++#ifndef IXDR_GET_LONG
++#define IXDR_GET_LONG(buf)              ((long)ntohl((ulong_t)*(buf)++))
++#define  IXDR_GET_U_LONG(buf)            ((ulong_t)IXDR_GET_LONG(buf))
++
++#endif
++#ifndef IXDR_PUT_LONG
++#define IXDR_PUT_LONG(buf, v)           (*(buf)++ = (long)htonl((ulong_t)v))
++#define  IXDR_PUT_U_LONG(buf, v)         IXDR_PUT_LONG((buf), ((long)(v)))
++#endif
++
+ #ifndef NDMOS_OPTION_NO_NDMP4
+ #define ndmp4_u_quad unsigned long long
+ extern bool_t xdr_ndmp4_u_quad();

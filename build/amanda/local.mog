@@ -1,0 +1,25 @@
+group gid=33 groupname=backup
+user ftpuser=false gcos-field="Amanda Reserved UID" group=backup login-shell=/usr/bin/pfksh password=NP uid=33 username=amanda home-dir=/var/lib/amanda
+license COPYING license=GPLv2
+license COPYING.LIB license=LGPLv2
+license LICENSE license=Apache2
+<transform file path=opt/csd/sbin/amservice -> set group backup>
+<transform file path=opt/csd/sbin/amservice -> set mode 4750>
+<transform file path=opt/csd/libexec/amanda/calcsize -> set group backup>
+<transform file path=opt/csd/libexec/amanda/calcsize -> set mode 4750>
+<transform file path=opt/csd/libexec/amanda/killpgrp -> set group backup>
+<transform file path=opt/csd/libexec/amanda/killpgrp -> set mode 4750>
+<transform file path=opt/csd/libexec/amanda/rundump -> set group backup>
+<transform file path=opt/csd/libexec/amanda/rundump -> set mode 4750>
+<transform file path=opt/csd/libexec/amanda/runtar -> set group backup>
+<transform file path=opt/csd/libexec/amanda/runtar -> set mode 4750>
+<transform file path=opt/csd/libexec/amanda/application/amgtar -> set group backup>
+<transform file path=opt/csd/libexec/amanda/application/amgtar -> set mode 4750>
+<transform file path=opt/csd/libexec/amanda/application/amstar -> set group backup>
+<transform file path=opt/csd/libexec/amanda/application/amstar -> set mode 4750>
+<transform file path=opt/csd/sbin/amcheck -> set group backup>
+<transform file path=opt/csd/sbin/amcheck -> set mode 4750>
+<transform file path=opt/csd/libexec/amanda/dumper -> set group backup>
+<transform file path=opt/csd/libexec/amanda/dumper -> set mode 4750>
+<transform file path=opt/csd/libexec/amanda/planner -> set group backup>
+<transform file path=opt/csd/libexec/amanda/planner -> set mode 4750>
