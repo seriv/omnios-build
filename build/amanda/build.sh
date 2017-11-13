@@ -28,7 +28,7 @@
 . ../../lib/functions.sh
 
 PROG=amanda     # App name
-VER=3.3.3       # App version
+VER=3.3.9       # App version
 VERHUMAN=$VER   # Human-readable version
 #PVER=          # Branch (set in config.sh, override here if needed)
 PKG=csd/backup/amanda

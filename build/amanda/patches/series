@@ -1,7 +1,5 @@
 amanda-3.1.1-xattrs.patch -p1
 amanda-3.1.1-tcpport.patch -p1
 amanda-3.2.0-config-dir.patch -p1
-amanda-3.3.1-stdio.patch -p1
-amanda-3.3.2-autogen.patch -p1
 amanda-common-makefile.patch -p1
 amanda-3.3.3-solaris-IXDR_U_LONG.patch -p1
