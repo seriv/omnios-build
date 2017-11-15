@@ -1,0 +1,15 @@
+--- slang-2.2.4.orig/src/slproc.c	2011-04-11 02:37:07.000000000 +0000
++++ slang-2.2.4/src/slproc.c	2017-11-15 11:55:16.561412608 +0000
+@@ -20,12 +20,6 @@
+ USA.
+ */
+ 
+-#ifndef _XOPEN_SOURCE
+-# define _XOPEN_SOURCE
+-#endif
+-#ifndef _XOPEN_SOURCE_EXTENDED
+-# define _XOPEN_SOURCE_EXTENDED 1
+-#endif
+ 
+ #ifndef __EXTENSIONS__
+ # define __EXTENSIONS__

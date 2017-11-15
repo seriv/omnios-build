@@ -30,13 +30,13 @@
 PROG=postfix    # App name
 VER=3.1.0       # App version
 VERHUMAN=$VER   # Human-readable version
-PVER=2.151014   # Branch (set in config.sh, override here if needed)
+PVER=2.151022   # Branch (set in config.sh, override here if needed)
 PKG=csd/mail/postfix            # Package name (e.g. library/foo)
 SUMMARY="Postfix mail server"      # One-liner, must be filled in
 DESC="Wietse Venema's mail server alternative to Sendmail"         # Longer description, must be filled in
 
 BUILDARCH="64"
-BUILD_DEPENDS_IPS="library/pcre"
+BUILD_DEPENDS_IPS="library/pcre csd/network/openldap"
 
 configure32() {
     logmsg "--- Skipping configure - not required"

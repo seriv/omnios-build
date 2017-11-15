@@ -1,2 +1,2 @@
 #!/bin/bash
-/opt/gcc-4.8.1/bin/gcc -m64 $@
+/opt/gcc-5.1.0/bin/gcc -m64 $@
